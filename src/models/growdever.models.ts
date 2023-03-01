@@ -8,7 +8,7 @@ export class Growdever {
         private _nome: string, 
         private _idade: number, 
         private _cidade: string, 
-        private _skills: string []
+        private _skills?: string []
     ){
         this._id = createUuid ()
     }
@@ -29,6 +29,16 @@ export class Growdever {
         this._idade = idade
     }
 
+    //Get serve para consultar
+    public get skills () {
+        return this._skills ?? []
+    }
+
+    //Set serve para setar e ele precisa receber um parametro tambem
+    public set skills (skills: string []) {
+        this._skills = skills
+    }
+
     //criando um adapter
 
     public toJson () {
@@ -37,7 +47,7 @@ export class Growdever {
             nome: this._nome,
             idade: this._idade,
             cidade: this._cidade,
-            skills: this._skills
+            skills: this.skills
         }
     }
 }

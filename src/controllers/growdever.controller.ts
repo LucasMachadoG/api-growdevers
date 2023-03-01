@@ -67,7 +67,6 @@ export class GrowdeverController {
 
     public create (req: Request, res: Response) {
         try {
-
             const {nome, idade, cidade, skills} = req.body
 
             if (!nome) {
@@ -88,13 +87,6 @@ export class GrowdeverController {
                 return res.status(400).send({
                     ok: false,
                     message: "Cidade was not provided"
-                })
-            }
-
-            if (!skills) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Skills was not provided"
                 })
             }
 
