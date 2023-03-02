@@ -27,4 +27,8 @@ export class GrowdeverDatabase {
     public delete (index: number) {
         growdevers.splice (index, 1)
     }
+
+    public getBycpf (cpf: number) {
+        return growdevers.find ((growdever) => growdever.cpf === cpf)
+    } 
 }

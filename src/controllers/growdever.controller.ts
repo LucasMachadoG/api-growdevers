@@ -1,6 +1,8 @@
 //A ideia do controller eh ter um metodo para cada rota que nos tiver na nossa API  
 import { Request, Response } from "express";
 import { GrowdeverDatabase } from "../database/growdever.database";
+import { requestError } from "../errors/request.error";
+import { serverError } from "../errors/server.error";
 import { Growdever } from "../models/growdever.models";
 
 export class GrowdeverController {
@@ -31,10 +33,7 @@ export class GrowdeverController {
                 data: result
             })
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 
@@ -46,51 +45,45 @@ export class GrowdeverController {
             const growdever = database.get(id)
 
             if (!growdever) {
-                return res.status(404).send ({
-                    ok: false,
-                    message: "Growdever not found"
-                })
+                return requestError.notFoundError(res, "Growdever")
             }
-
+            
             res.status (200).send ({
                 ok: true, 
                 message: "Growdever successfully obtained",
                 data: growdever
             })
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 
     public create (req: Request, res: Response) {
         try {
-            const {nome, idade, cidade, skills} = req.body
+            const {nome, idade, cidade, cpf,  skills} = req.body
 
             if (!nome) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Nome was not provided"
-                })
+                // return res.status(400).send({
+                //     ok: false,
+                //     message: "Nome was not provided"
+                // })
+
+                return requestError.fieldNotProvided(res, "Nome")
             }
 
             if (!idade) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Idade was not provided"
-                })
+                return requestError.fieldNotProvided (res, "Idade")
             }
 
             if (!cidade) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Cidade was not provided"
-                })
+                return requestError.fieldNotProvided (res, "Cidade")
             }
 
-            const growdever = new Growdever(nome, idade, cidade, skills)
+            if (!cpf) {
+                return requestError.fieldNotProvided (res, "CPF")
+            }
+
+            const growdever = new Growdever(nome, idade, cidade, cpf, skills)
 
             const database = new GrowdeverDatabase ()
             database.create(growdever)
@@ -102,10 +95,7 @@ export class GrowdeverController {
             })
 
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 
@@ -117,10 +107,7 @@ export class GrowdeverController {
             const growdeverIndex = database.getIndex(id)
 
             if (growdeverIndex < 0) {
-                return res.status(404).send({
-                    ok: false,
-                    message: "Growdever not found"
-                })
+                return requestError.notFoundError(res, "Growdever")
             }
 
             database.delete(growdeverIndex)
@@ -131,10 +118,7 @@ export class GrowdeverController {
             })
 
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 
@@ -147,10 +131,7 @@ export class GrowdeverController {
             const growdever = database.get(id)
 
             if (!growdever) {
-                return res.status(404).send({
-                    ok: false,
-                    message: "Growdever not found"
-                })
+                return requestError.notFoundError(res, "Growdever")
             }
 
            if (idade) {
@@ -163,10 +144,7 @@ export class GrowdeverController {
             })
 
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 }

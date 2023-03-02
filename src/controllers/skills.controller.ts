@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { GrowdeverDatabase } from "../database/growdever.database";
+import { requestError } from "../errors/request.error";
+import { serverError } from "../errors/server.error";
 
 export class SkillController {
     public create(req: Request, res: Response) {
@@ -9,19 +11,13 @@ export class SkillController {
             const database = new GrowdeverDatabase ()
 
             if (!skills) {
-                return res.status(400).send ({
-                    ok: false,
-                    message: "Skills were not provider"
-                })
+                return requestError.notFoundError(res, "Skill")
             }
 
             const growdever = database.get(id)
 
             if (!growdever) {
-                return res.status(404).send ({
-                    ok: false,
-                    message: "Growdever not found"
-                })
+                return requestError.notFoundError(res, "Growdever")
             }
 
             //Concat cria uma copia mas ele nao muda o array original
@@ -38,10 +34,7 @@ export class SkillController {
             })
 
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false, 
-                messagem: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 
@@ -53,19 +46,13 @@ export class SkillController {
             const growdever = database.get(id)
 
             if (!growdever) {
-                return res.status(404).send ({
-                    ok: false,
-                    message: "Growdever not found"
-                })
+                return requestError.notFoundError(res, "Growdever")
             }
 
             const skillIndex = growdever.skills.findIndex((item) => item === skill)
 
             if (skillIndex < 0) {
-                return res.status(404).send({
-                    ok: false,
-                    message: "Skill not found"
-                })
+                return requestError.notFoundError(res, "Skill")
             }
 
             growdever.skills.splice(skillIndex, 1)
@@ -77,10 +64,7 @@ export class SkillController {
             })
 
         } catch (error: any) {
-            return res.status(500).send ({
-                ok: false,
-                message: error.toString()
-            })
+            return serverError.genericError (res, error)
         }
     }
 }
