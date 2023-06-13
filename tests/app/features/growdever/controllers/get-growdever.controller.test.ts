@@ -21,8 +21,8 @@ describe("Get growdever controller unit tests", () => {
     });
 
     beforeEach(async () => {
-        jest.clearAllMocks();
-        jest.resetAllMocks();
+        jest.clearAllMocks()
+        jest.resetAllMocks()
 
         await DatabaseConnection.connection
             .getRepository(GrowdeverEntity)
@@ -32,63 +32,54 @@ describe("Get growdever controller unit tests", () => {
     const app = createApp();
 
     const createGrowdever = async (growdever: Growdever) => {
-        await DatabaseConnection.connection
-            .getRepository(GrowdeverEntity)
-            .create({
-                id: growdever.id,
-                cpf: growdever.cpf,
-                idade: growdever.idade,
-                nome: growdever.nome,
-                nota: 10,
-                indAtivo: true,
-            })
-            .save();
-    };
+        await DatabaseConnection.connection.getRepository(GrowdeverEntity).create({
+            id: growdever.id,
+            cpf: growdever.cpf,
+            idade: growdever.idade, 
+            nome: growdever.nome,
+            nota: 10,
+            indAtivo: true
+        }).save()
+    }
 
-    test("Deveria retornar erro 404 se o growdever não foi encontrado", async () => {
-        const result = await request(app).get(`/growdever/123`).send();
+    test("Deveria retornar erro 404 se o growdever nao for encontrado", async () => {
+        const result = await request(app).get("/growdever/123").send()
 
-        expect(result).toBeDefined();
-        expect(result.statusCode).toBe(404);
+        expect(result).toBeDefined()
+        expect(result.statusCode).toBe(404)
 
-        expect(result.body).toBeDefined();
-        expect(result.body).toHaveProperty("ok", false);
-        expect(result.body).toHaveProperty("message", "Growdever not found");
-    });
+        expect(result.body).toBeDefined()
+        expect(result.body).toHaveProperty("ok", false)
+        expect(result.body).toHaveProperty("message", "Growdever not found")
+    })
 
-    test("Deveria retornar 200 se o growdever foi encontrado", async () => {
-        const growdever = new Growdever("Jose", 20, "POA", 123456, "12354");
-        await createGrowdever(growdever);
+    test("Deveria retornar erro 200 se o growdever for encontrado", async () => {
+        const growdever = new Growdever("Jose", 20, "POA", 123456, "12345")
 
-        const result = await request(app)
-            .get(`/growdever/${growdever.id}`)
-            .send();
+        await createGrowdever(growdever)
 
-        expect(result).toBeDefined();
-        expect(result.statusCode).toBe(200);
+        const result = await request(app).get(`/growdever/${growdever.id}`).send()
 
-        expect(result.body).toBeDefined();
-        expect(result.body).toHaveProperty("ok", true);
-        expect(result.body).toHaveProperty(
-            "message",
-            "Growdever successfully obtained"
-        );
-    });
+        expect(result).toBeDefined()
+        expect(result.statusCode).toBe(200)
 
-    test("Deveria retornar 500 se o repository gerou exceção", async () => {
-        jest.spyOn(GrowdeverRepository.prototype, "get").mockImplementation(
-            (_: string) => {
-                throw new Error("Mock error");
-            }
-        );
+        expect(result.body).toBeDefined()
+        expect(result.body).toHaveProperty("ok", true)
+        expect(result.body).toHaveProperty("message", "Growdever successfully obtained")
+    })
 
-        const result = await request(app).get(`/growdever/123`).send();
+    test("Deveria retornar 500 se o respository virou excecao", async () => {
+        jest.spyOn(GrowdeverRepository.prototype, "get").mockImplementation((_: string) => {
+            throw new Error("Mock error")
+        })
 
-        expect(result).toBeDefined();
-        expect(result.statusCode).toBe(500);
+        const result = await request(app).get(`/growdever/123`).send()
 
-        expect(result.body).toBeDefined();
-        expect(result.body).toHaveProperty("ok", false);
-        expect(result.body).toHaveProperty("message", "Error: Mock error");
-    });
+        expect(result).toBeDefined()
+        expect(result.statusCode).toBe(500)
+
+        expect(result.body).toBeDefined()
+        expect(result.body).toHaveProperty("ok", false)
+        expect(result.body).toHaveProperty("message", "Error: Mock error")
+    })
 });

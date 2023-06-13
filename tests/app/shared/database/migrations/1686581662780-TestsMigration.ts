@@ -1,12 +1,13 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class TestsMigration1683070237907 implements MigrationInterface {
-    name = 'TestsMigration1683070237907'
+export class TestsMigration1686581662780 implements MigrationInterface {
+    name = 'TestsMigration1686581662780'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "endereco" ("id_growdever" varchar PRIMARY KEY NOT NULL, "rua" varchar NOT NULL, "cidade" varchar NOT NULL, "estado" varchar NOT NULL, "cep" integer NOT NULL, CONSTRAINT "REL_c61a16a427330f014ba485f2cd" UNIQUE ("id_growdever"))`);
         await queryRunner.query(`CREATE TABLE "categoria" ("id" varchar PRIMARY KEY NOT NULL, "nome" varchar NOT NULL, "dthr_criacao" datetime NOT NULL DEFAULT (datetime('now')))`);
         await queryRunner.query(`CREATE TABLE "skill" ("id" varchar PRIMARY KEY NOT NULL, "nome" varchar NOT NULL, "arquivada" varchar NOT NULL, "id_growdever" varchar NOT NULL)`);
+        await queryRunner.query(`CREATE TABLE "project" ("id" varchar PRIMARY KEY NOT NULL, "ind_ativo" boolean NOT NULL DEFAULT (1), "nome" varchar NOT NULL, "dt_entrega" datetime NOT NULL, "growdever_id" varchar NOT NULL)`);
         await queryRunner.query(`CREATE TABLE "growdever" ("id" varchar PRIMARY KEY NOT NULL, "nome" varchar(30) NOT NULL, "cpf" int8 NOT NULL, "idade" int2, "nota" integer NOT NULL, "ind_ativo" boolean NOT NULL, "dthr_atualizacao" datetime NOT NULL DEFAULT (datetime('now')))`);
         await queryRunner.query(`CREATE TABLE "avaliacao" ("id" varchar PRIMARY KEY NOT NULL, "nota" decimal(4,2) NOT NULL, "modulo" varchar(30) NOT NULL, "mentor" varchar(30), "id_growdever" varchar NOT NULL, "dthr_criacao" datetime NOT NULL DEFAULT (datetime('now')), "dthr_atualizacao" datetime NOT NULL DEFAULT (datetime('now')))`);
         await queryRunner.query(`CREATE TABLE "skill_categoria" ("id_skill" varchar NOT NULL, "id_categoria" varchar NOT NULL, PRIMARY KEY ("id_skill", "id_categoria"))`);
@@ -20,6 +21,10 @@ export class TestsMigration1683070237907 implements MigrationInterface {
         await queryRunner.query(`INSERT INTO "temporary_skill"("id", "nome", "arquivada", "id_growdever") SELECT "id", "nome", "arquivada", "id_growdever" FROM "skill"`);
         await queryRunner.query(`DROP TABLE "skill"`);
         await queryRunner.query(`ALTER TABLE "temporary_skill" RENAME TO "skill"`);
+        await queryRunner.query(`CREATE TABLE "temporary_project" ("id" varchar PRIMARY KEY NOT NULL, "ind_ativo" boolean NOT NULL DEFAULT (1), "nome" varchar NOT NULL, "dt_entrega" datetime NOT NULL, "growdever_id" varchar NOT NULL, CONSTRAINT "FK_525c19d0326c94440606d8760bc" FOREIGN KEY ("growdever_id") REFERENCES "growdever" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION)`);
+        await queryRunner.query(`INSERT INTO "temporary_project"("id", "ind_ativo", "nome", "dt_entrega", "growdever_id") SELECT "id", "ind_ativo", "nome", "dt_entrega", "growdever_id" FROM "project"`);
+        await queryRunner.query(`DROP TABLE "project"`);
+        await queryRunner.query(`ALTER TABLE "temporary_project" RENAME TO "project"`);
         await queryRunner.query(`CREATE TABLE "temporary_avaliacao" ("id" varchar PRIMARY KEY NOT NULL, "nota" decimal(4,2) NOT NULL, "modulo" varchar(30) NOT NULL, "mentor" varchar(30), "id_growdever" varchar NOT NULL, "dthr_criacao" datetime NOT NULL DEFAULT (datetime('now')), "dthr_atualizacao" datetime NOT NULL DEFAULT (datetime('now')), CONSTRAINT "growdever_avaliacao_fk" FOREIGN KEY ("id_growdever") REFERENCES "growdever" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)`);
         await queryRunner.query(`INSERT INTO "temporary_avaliacao"("id", "nota", "modulo", "mentor", "id_growdever", "dthr_criacao", "dthr_atualizacao") SELECT "id", "nota", "modulo", "mentor", "id_growdever", "dthr_criacao", "dthr_atualizacao" FROM "avaliacao"`);
         await queryRunner.query(`DROP TABLE "avaliacao"`);
@@ -47,6 +52,10 @@ export class TestsMigration1683070237907 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "avaliacao" ("id" varchar PRIMARY KEY NOT NULL, "nota" decimal(4,2) NOT NULL, "modulo" varchar(30) NOT NULL, "mentor" varchar(30), "id_growdever" varchar NOT NULL, "dthr_criacao" datetime NOT NULL DEFAULT (datetime('now')), "dthr_atualizacao" datetime NOT NULL DEFAULT (datetime('now')))`);
         await queryRunner.query(`INSERT INTO "avaliacao"("id", "nota", "modulo", "mentor", "id_growdever", "dthr_criacao", "dthr_atualizacao") SELECT "id", "nota", "modulo", "mentor", "id_growdever", "dthr_criacao", "dthr_atualizacao" FROM "temporary_avaliacao"`);
         await queryRunner.query(`DROP TABLE "temporary_avaliacao"`);
+        await queryRunner.query(`ALTER TABLE "project" RENAME TO "temporary_project"`);
+        await queryRunner.query(`CREATE TABLE "project" ("id" varchar PRIMARY KEY NOT NULL, "ind_ativo" boolean NOT NULL DEFAULT (1), "nome" varchar NOT NULL, "dt_entrega" datetime NOT NULL, "growdever_id" varchar NOT NULL)`);
+        await queryRunner.query(`INSERT INTO "project"("id", "ind_ativo", "nome", "dt_entrega", "growdever_id") SELECT "id", "ind_ativo", "nome", "dt_entrega", "growdever_id" FROM "temporary_project"`);
+        await queryRunner.query(`DROP TABLE "temporary_project"`);
         await queryRunner.query(`ALTER TABLE "skill" RENAME TO "temporary_skill"`);
         await queryRunner.query(`CREATE TABLE "skill" ("id" varchar PRIMARY KEY NOT NULL, "nome" varchar NOT NULL, "arquivada" varchar NOT NULL, "id_growdever" varchar NOT NULL)`);
         await queryRunner.query(`INSERT INTO "skill"("id", "nome", "arquivada", "id_growdever") SELECT "id", "nome", "arquivada", "id_growdever" FROM "temporary_skill"`);
@@ -60,6 +69,7 @@ export class TestsMigration1683070237907 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "skill_categoria"`);
         await queryRunner.query(`DROP TABLE "avaliacao"`);
         await queryRunner.query(`DROP TABLE "growdever"`);
+        await queryRunner.query(`DROP TABLE "project"`);
         await queryRunner.query(`DROP TABLE "skill"`);
         await queryRunner.query(`DROP TABLE "categoria"`);
         await queryRunner.query(`DROP TABLE "endereco"`);

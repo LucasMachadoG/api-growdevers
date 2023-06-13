@@ -6,8 +6,9 @@ import { DatabaseConnection } from "../../../../../src/main/database/typeorm.con
 import { createApp } from "../../../../../src/main/config/express.config";
 import { CreateGrowdeverUsecase } from "../../../../../src/app/features/growdever/usecases/create-growdever.usecase";
 import { GrowdeverRepository } from "../../../../../src/app/features/growdever/repositories/growdever.repository";
-import { Growdever } from "../../../../../src/app/models/growdever.model";
 import { GrowdeverEntity } from "../../../../../src/app/shared/database/entities/growdever.entity";
+
+// O supertest permite fazer requisicoes http
 
 describe("Create growdever controller unit tests", () => {
     beforeAll(async () => {

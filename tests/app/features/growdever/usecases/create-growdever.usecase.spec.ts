@@ -1,5 +1,4 @@
 import { cpf as cpfValidator } from "cpf-cnpj-validator";
-
 import { GrowdeverRepository } from "./../../../../../src/app/features/growdever/repositories/growdever.repository";
 import { RedisConnection } from "../../../../../src/main/database/redis.connection";
 import { DatabaseConnection } from "../../../../../src/main/database/typeorm.connection";
@@ -9,6 +8,7 @@ import { CreateGrowdeverRepositoryContract } from "../../../../../src/app/featur
 import { CacheRepository } from "../../../../../src/app/shared/database/repositories/cache.repository";
 import { createGrowdeverUsecaseFactory } from "../../../../../src/app/features/growdever/util/growdever-usecase.factory";
 
+// Por convencao, nome dos arquivos para teste unitarios sao .spec e testes de integracao .test
 class MockGrowdeverRepository implements CreateGrowdeverRepositoryContract {
     public async create(growdever: Growdever): Promise<Growdever> {
         return new Growdever(
@@ -95,6 +95,9 @@ describe.skip("Create growdever usecase unit tests", () => {
     });
 
     test("deveria retornar sucesso (201) se o growdever for criado com sucesso", async () => {
+        // Esse teste aqui vai sumilar o comportamento do banco de dados (jest.spyOn)
+        // Como o crate do growdeverRepository eh async, ele vai retornar uma promisse e esse mockResolvedValue vai retornar uma promisse que foi
+        // resolvida e como parametro vai ser o retorno, neste caso uma promise de Growdever
         jest.spyOn(GrowdeverRepository.prototype, "create").mockResolvedValue(
             new Growdever(
                 growdever.nome,

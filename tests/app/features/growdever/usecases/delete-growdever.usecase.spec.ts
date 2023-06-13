@@ -4,11 +4,13 @@ import { DatabaseConnection } from "../../../../../src/main/database/typeorm.con
 import { GrowdeverRepository } from "../../../../../src/app/features/growdever/repositories/growdever.repository";
 
 describe.skip("Delete growdever usecase tests", () => {
+    // Esse beforeAll eh uma funcao que a gente executa antes dos testes
     beforeAll(async () => {
         await DatabaseConnection.connect();
         await RedisConnection.connect();
     });
 
+    // Esse afterAll eh uma funcao que a gente executa depois de terminar todos os testes
     afterAll(async () => {
         await DatabaseConnection.connection.destroy();
         await RedisConnection.connection.quit();
